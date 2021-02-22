@@ -160,7 +160,7 @@ words = ['apple', 'bat', 'bar', 'atom', 'book']
 
 # 给定一个list或tuple，我们可以通过for循环来遍历这个list或tuple，这种遍历我们称为迭代（Iteration）
 # 迭代是通过for ... in来完成
-dict = {'a': 1, 'b': 2, 'c': 3}
+# dict = {'a': 1, 'b': 2, 'c': 3}
 # for key in dict:
 #     print(key)
 # for value in dict.values():
@@ -1029,20 +1029,41 @@ from enum import Enum
 
 # 需要更精确地控制枚举类型，可以从Enum派生出自定义类
 # @unique装饰器可以帮助我们检查保证没有重复值。
-@unique
-class WeekDay(Enum):
-    Sun = 0 # Sun的value被设定为0
-    Mon = 1
-    Tue = 2
-    Wed = 3
-    Thu = 4
-    Fri = 5
-    Sat = 6
+# @unique
+# class WeekDay(Enum):
+#     Sun = 0 # Sun的value被设定为0
+#     Mon = 1
+#     Tue = 2
+#     Wed = 3
+#     Thu = 4
+#     Fri = 5
+#     Sat = 6
 
-print(WeekDay.Sun)  #WeekDay.Sun
-print(WeekDay['Sun']) #WeekDay.Sun
-print(WeekDay(1))  #WeekDay.Mon
-print(WeekDay(0))  #WeekDay.Sun
-print(WeekDay.Sun.value) #0
+# print(WeekDay.Sun)  #WeekDay.Sun
+# print(WeekDay['Sun']) #WeekDay.Sun
+# print(WeekDay(1))  #WeekDay.Mon
+# print(WeekDay(0))  #WeekDay.Sun
+# print(WeekDay.Sun.value) #0
 
+# 使用元类
+# https://www.liaoxuefeng.com/wiki/1016959663602400/1017592449371072
+# type：动态创建类
+# 要创建一个class对象，type()函数依次传入3个参数：
+# class的名称；
+# 继承的父类集合，注意Python支持多重继承，如果只有一个父类，别忘了tuple的单元素写法；
+# class的方法名称与函数绑定，这里我们把函数fn绑定到方法名hello上。
+
+# def fn(self, name='world'): # 先定义函数
+#     print('Hello, %s.' % name)
+
+# Hello = type('Hello', (object,), dict(hello=fn)) # 创建Hello class
+# h = Hello()
+# h.hello()
+
+# 动态语言和静态语言最大的不同，就是函数和类的定义，不是编译时定义的，而是运行时动态创建的。
+# metaclass: 直译为元类,控制类的创建行为
+# 先定义metaclass，就可以创建类，最后创建实例。
+# metaclass允许你创建类或者修改类。换句话说，你可以把类看成是metaclass创建出来的“实例”。
+
+# 错误处理 try expect finally 
 
