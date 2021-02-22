@@ -1072,7 +1072,7 @@ class Parrot(Bird, Flyable):
 # 文件读写
 # https://www.liaoxuefeng.com/wiki/1016959663602400/1017607179232640
 # try:
-#     f = open('./pythonTest/io/io_1.txt','r',encoding='utf-8')
+#     f = open('./io/io_1.txt','r',encoding='utf-8')
 #     print(f.read())
 # finally:
 #     if f:
@@ -1080,34 +1080,34 @@ class Parrot(Bird, Flyable):
 #         print('bb')
     
 # Python引入了with语句来自动帮我们调用close()方法
-# with open('./pythonTest/io/io_1.txt','r',encoding='utf-8') as f2:
+# with open('./io/io_1.txt','r',encoding='utf-8') as f2:
 #     print(f2.read())
 
 # 调用read()会一次性读取文件的全部内容，如果文件有10G，内存就爆了，所以，要保险起见，可以反复调用read(size)方法，每次最多读取size个字节的内容。
 # 另外，调用readline()可以每次读取一行内容，调用readlines()一次读取所有内容并按行返回list。因此，要根据需要决定怎么调用。
-# with open('./pythonTest/io/io_1.txt','r',encoding='utf-8') as f3:
+# with open('./io/io_1.txt','r',encoding='utf-8') as f3:
 #     print(f3.readline()) #读取单行
  
 # 遇到有些编码不规范的文件，你可能会遇到UnicodeDecodeError，open()函数还接收一个errors参数，表示如果遇到编码错误后如何处理。最简单的方式是直接忽略
-# f3 = open('./pythonTest/io/io_1.txt','r',encoding='utf-8',errors='ignore')
+# f3 = open('./io/io_1.txt','r',encoding='utf-8',errors='ignore')
 
 # 写文件
 # 调用open()函数时，传入标识符'w'或者'wb'表示写文本文件或写二进制文件
-# f4 = open('./pythonTest/io/io_2.txt','w')
+# f4 = open('./io/io_2.txt','w')
 # f4.write('hello world')
 # f4.close()
 
-# with open ('./pythonTest/io/io_2.txt','w') as f5:
+# with open ('./io/io_2.txt','w') as f5:
 #     f5.write('hello world2')
 
 # 以'w'模式写入文件时，如果文件已存在，会直接覆盖（相当于删掉后新写入一个文件）。
 # 如果我们希望追加到文件末尾怎么办？可以传入'a'以追加（append）模式写入。
-# with open('./pythonTest/io/io_2.txt','a')  as f6:
+# with open('./io/io_2.txt','a')  as f6:
 #     f6.write('\nhello append')
 
 
 # 要读取二进制文件，比如图片、视频等等，用'rb'模式打开文件即可：
-# with open('./pythonTest/io/p_t.png','rb') as f7:
+# with open('./io/p_t.png','rb') as f7:
 #     print(f7.read())
 
 
@@ -1162,7 +1162,7 @@ from io import BytesIO
 # 然后创建一个目录:
 # 删掉一个目录:
 from pathlib import Path
-# pt = os.path.join('.\\pythonTest\\io','testDir')
+# pt = os.path.join('.\\io','testDir')
 # print(pt)
 # if not os.path.exists(pt): #检测文件是否存在
 #     os.mkdir(pt)
@@ -1183,24 +1183,24 @@ from pathlib import Path
 # indows下会返回这样的字符串part-1\part-2
 # 这些合并、拆分路径的函数并不要求目录和文件要真实存在，它们只对字符串进行操作
 # 要拆分路径时，也不要直接去拆字符串，而要通过os.path.split()函数，这样可以把一个路径拆分为两部分，后一部分总是最后级别的目录或文件名：
-# print(os.path.split(pt))  #('./pythonTest/io', 'testDir')
+# print(os.path.split(pt))  #('./io', 'testDir')
 
 # os.path.splitext()可以直接让你得到文件扩展名
-# print(os.path.splitext(pt))  #('.\\pythonTest\\io\\testDir', '')
-# print(os.path.splitext('.\\pythonTest\\io\io_1.txt'))  #('.\\pythonTest\\io\\io_1', '.txt')
+# print(os.path.splitext(pt))  #('.\\io\\testDir', '')
+# print(os.path.splitext('.\\io\io_1.txt'))  #('.\\io\\io_1', '.txt')
 
 
 # 文件操作
 #  对文件重命名:  os.rename
-# url = '.\\pythonTest\\io\\io_4.txt'
+# url = '.\\io\\io_4.txt'
 # if os.path.exists(url):
-#     os.rename('.\\pythonTest\\io\\io_4.txt','.\\pythonTest\\io\\io_4.py')
+#     os.rename('.\\io\\io_4.txt','.\\io\\io_4.py')
 #     print('rename success')
 # else:
 #     print('rename file not exits')
 
 # 删掉文件:   os.remove
-# rurl = '.\\pythonTest\\io\\io_5.txt'
+# rurl = '.\\io\\io_5.txt'
 # if os.path.exists(rurl):
 #     os.remove(rurl)
 #     print('删除文件成功')
@@ -1210,8 +1210,8 @@ from pathlib import Path
 # shutil模块
 # 在os模块中不存在复制文件的函数 原因是复制文件并非由操作系统提供的系统调用 但shutil模块提供了copyfile()的函数
 # import shutil
-# cpNameStr = '.\\pythonTest\\io\\io_5.txt'
-# shutil.copyfile(cpNameStr,'.\\pythonTest\\io\\io_5copy.txt')
+# cpNameStr = '.\\io\\io_5.txt'
+# shutil.copyfile(cpNameStr,'.\\io\\io_5copy.txt')
 
 # 利用Python的特性来过滤文件
 # 列出当前目录下的所有目录
@@ -1256,6 +1256,45 @@ from pathlib import Path
 #             search_file(this_path,str,other)
 #     return Aggregate_list
 # print(search_file(searchPath,str,-1))
+
+
+# 序列化 https://www.liaoxuefeng.com/wiki/1016959663602400/1017624706151424
+# 把变量从内存中变成可存储或传输的过程称之为序列化，在Python中叫pickling，在其他语言中也被称之为serialization，marshalling，flattening等等
+# 把变量内容从序列化的对象重新读到内存里称之为反序列化，即unpickling。
+# import pickle
+# pd = dict(name='测试name',age=22,score=100)
+# # print(pickle.dumps(pd))
+
+# with open('./pick/dump.txt','wb') as f:
+#     pickle.dump(pd,f)
+
+# with open('./pick/dump.txt','rb') as f:
+#     print(pickle.load(f))
+
+# 如果我们要在不同的编程语言之间传递对象，就必须把对象序列化为标准格式，比如XML，但更好的方法是序列化为JSON，
+# 因为JSON表示出来就是一个字符串，可以被所有语言读取，也可以方便地存储到磁盘或者通过网络传输。
+# JSON不仅是标准格式，并且比XML更快，而且可以直接在Web页面中读取，非常方便
+import json
+# jd = dict(name='测试name',age=22,score=100)
+# # dumps()方法返回一个str
+# print(json.dumps(jd))  #{"name": "\u6d4b\u8bd5name", "age": 22, "score": 100}
+
+# 把JSON反序列化为Python对象，用loads()或者对应的load()方法，前者把JSON的字符串反序列化，后者从file-like Object中读取字符串并反序列化
+json_str = '{"name": "\u6d4b\u8bd5name", "age": 22, "score": 100}'
+print(json.loads(json_str)) #{'name': '测试name', 'age': 22, 'score': 100}
+
+# -------------------------------JSON进阶说明start-------------------------------------
+# JSON进阶 print(json.dumps(s, default=lambda obj: obj.__dict__))
+# 通常class的实例都有一个__dict__属性，它就是一个dict，用来存储实例变量。也有少数例外，比如定义了__slots__的class。
+# def student2dict(std):
+#     return {
+#         'name': std.name,
+#         'age': std.age,
+#         'score': std.score
+#     }
+# print(json.dumps(s, default=student2dict))
+# -------------------------------JSON进阶说明end-------------------------------------
+
 
 
 
