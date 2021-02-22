@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from enum import Enum
 import urllib.request
 import urllib.parse
 import string
@@ -945,7 +946,7 @@ class Parrot(Bird, Flyable):
 # class Student(object):
 #     def __init__(self,name):
 #         self.name = name
-    
+
 #     def __getattr__(self,attr):
 #         if(attr=='score'):
 #             return 3
@@ -971,7 +972,7 @@ class Parrot(Bird, Flyable):
 
 #     def __getattr__(self,path):
 #         return Chain('%s/%s' % (self._path,path))
-    
+
 #     def __str__(self):
 #         return self._path
 #     __repr__ = __str__
@@ -986,7 +987,7 @@ class Parrot(Bird, Flyable):
 # class Student(object):
 #     def __init__(self,name):
 #         self.name = name
-    
+
 #     def __call__(self):
 #         print('My name %s' % self.name)
 
@@ -994,15 +995,15 @@ class Parrot(Bird, Flyable):
 # s()  #直接调用__call__打印了
 # print(callable(Student('aa')))
 
- 
+
 # /users/:user/repos 调用时，需要把:user替换为实际用户名。如果我们能写出这样的链式调用  Chain().users('michael').repos
 # class Chain(object):
 #     def __init__(self,path=''):
 #         self._path = path
-    
+
 #     def __getattr__(self,path):
 #         return Chain('%s/%s' % (self._path,path))
-    
+
 #     def __call__(self,path):
 #         return Chain('%s/%s' % (self._path,path))
 
@@ -1017,7 +1018,6 @@ class Parrot(Bird, Flyable):
 # 每个常量都是class的一个唯一实例。Python提供了Enum类来实现
 # 既可以用成员名称引用枚举常量，又可以直接根据value的值获得枚举常量。
 # Enum可以把一组相关常量定义在一个class中，且class不可变，而且成员可以直接比较
-from enum import Enum
 # Month = Enum('Month',('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'))
 # Month = Enum('Month', ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'))
 # # value属性则是自动赋给成员的int常量，默认从1开始计数。
@@ -1065,5 +1065,204 @@ from enum import Enum
 # 先定义metaclass，就可以创建类，最后创建实例。
 # metaclass允许你创建类或者修改类。换句话说，你可以把类看成是metaclass创建出来的“实例”。
 
-# 错误处理 try expect finally 
+# 错误处理 try expect finally
 
+
+# IO编程
+# 文件读写
+# https://www.liaoxuefeng.com/wiki/1016959663602400/1017607179232640
+# try:
+#     f = open('./pythonTest/io/io_1.txt','r',encoding='utf-8')
+#     print(f.read())
+# finally:
+#     if f:
+#         f.close()
+#         print('bb')
+    
+# Python引入了with语句来自动帮我们调用close()方法
+# with open('./pythonTest/io/io_1.txt','r',encoding='utf-8') as f2:
+#     print(f2.read())
+
+# 调用read()会一次性读取文件的全部内容，如果文件有10G，内存就爆了，所以，要保险起见，可以反复调用read(size)方法，每次最多读取size个字节的内容。
+# 另外，调用readline()可以每次读取一行内容，调用readlines()一次读取所有内容并按行返回list。因此，要根据需要决定怎么调用。
+# with open('./pythonTest/io/io_1.txt','r',encoding='utf-8') as f3:
+#     print(f3.readline()) #读取单行
+ 
+# 遇到有些编码不规范的文件，你可能会遇到UnicodeDecodeError，open()函数还接收一个errors参数，表示如果遇到编码错误后如何处理。最简单的方式是直接忽略
+# f3 = open('./pythonTest/io/io_1.txt','r',encoding='utf-8',errors='ignore')
+
+# 写文件
+# 调用open()函数时，传入标识符'w'或者'wb'表示写文本文件或写二进制文件
+# f4 = open('./pythonTest/io/io_2.txt','w')
+# f4.write('hello world')
+# f4.close()
+
+# with open ('./pythonTest/io/io_2.txt','w') as f5:
+#     f5.write('hello world2')
+
+# 以'w'模式写入文件时，如果文件已存在，会直接覆盖（相当于删掉后新写入一个文件）。
+# 如果我们希望追加到文件末尾怎么办？可以传入'a'以追加（append）模式写入。
+# with open('./pythonTest/io/io_2.txt','a')  as f6:
+#     f6.write('\nhello append')
+
+
+# 要读取二进制文件，比如图片、视频等等，用'rb'模式打开文件即可：
+# with open('./pythonTest/io/p_t.png','rb') as f7:
+#     print(f7.read())
+
+
+# StringIO和BytesIO是在内存中操作str和bytes的方法
+# StringIO操作的只能是str
+# BytesIO操作二进制数据
+from io import StringIO
+from io import BytesIO
+# sio = StringIO()
+# sio.write('测试io')
+# print(sio.getvalue())
+
+# 以用一个str初始化StringIO 然后，像读文件一样读取
+# sio2 = StringIO('hello\nworld\npython')
+# while True:
+#     s = sio2.readline()
+#     if s=='':
+#         break
+#     print(s.strip())
+
+
+# bio = BytesIO()
+# bio.write('中文'.encode('utf-8'))
+# print(bio.getvalue())
+
+# \xe4\xb8\xad\xe6\x96\x87
+# 用一个bytes初始化BytesIO 然后，像读文件一样读取
+# bio2 = BytesIO(b'\xe4\xb8\xad\xe6\x96\x87')
+# print(bio2.read())
+
+
+# 操作文件和目录 https://www.liaoxuefeng.com/wiki/1016959663602400/1017623135437088
+# Python内置的os模块也可以直接调用操作系统提供的接口函数
+
+# 如果是posix，说明系统是Linux、Unix或Mac OS X，如果是nt，就是Windows系统。
+# print(os.name)
+
+# 要获取详细的系统信息，可以调用uname()函数  uname()函数在Windows上不提供，也就是说，os模块的某些函数是跟操作系统相关的 
+
+# 环境变量
+# print(os.environ)
+# 要获取某个环境变量的值，可以调用os.environ.get('key')：
+# print(os.environ.get('PATH'))   
+
+# 操作文件和目录
+# 操作文件和目录的函数一部分放在os模块中，一部分放在os.path模块中，这一点要注意一下。查看、创建和删除目录可以这么调用：
+
+# 查看当前目录的绝对路径
+# print('当前目录绝对路径-----',os.path.abspath('.'))
+
+# 在某个目录下创建一个新目录，首先把新目录的完整路径表示出来:
+# 然后创建一个目录:
+# 删掉一个目录:
+from pathlib import Path
+# pt = os.path.join('.\\pythonTest\\io','testDir')
+# print(pt)
+# if not os.path.exists(pt): #检测文件是否存在
+#     os.mkdir(pt)
+#     print('创建目录')
+# else:
+#     os.rmdir(pt)
+#     print('删除目录')
+# my_file = Path(pt)  
+# if my_file.is_dir(): #检测是否为一个目录 指定的目录存在
+#     print('是一个目录')  #指定的文件存在
+# if my_file.is_file():
+#     print('是一个文件')
+# if my_file.exists(): #检测路径是一个文件或目录可以使用 exists() 
+#     print('文件或目录存在')
+
+# 把两个路径合成一个时，不要直接拼字符串，而要通过os.path.join()函数，这样可以正确处理不同操作系统的路径分隔符
+# 在Linux/Unix/Mac下，os.path.join()返回这样的字符串：part-1/part-2
+# indows下会返回这样的字符串part-1\part-2
+# 这些合并、拆分路径的函数并不要求目录和文件要真实存在，它们只对字符串进行操作
+# 要拆分路径时，也不要直接去拆字符串，而要通过os.path.split()函数，这样可以把一个路径拆分为两部分，后一部分总是最后级别的目录或文件名：
+# print(os.path.split(pt))  #('./pythonTest/io', 'testDir')
+
+# os.path.splitext()可以直接让你得到文件扩展名
+# print(os.path.splitext(pt))  #('.\\pythonTest\\io\\testDir', '')
+# print(os.path.splitext('.\\pythonTest\\io\io_1.txt'))  #('.\\pythonTest\\io\\io_1', '.txt')
+
+
+# 文件操作
+#  对文件重命名:  os.rename
+# url = '.\\pythonTest\\io\\io_4.txt'
+# if os.path.exists(url):
+#     os.rename('.\\pythonTest\\io\\io_4.txt','.\\pythonTest\\io\\io_4.py')
+#     print('rename success')
+# else:
+#     print('rename file not exits')
+
+# 删掉文件:   os.remove
+# rurl = '.\\pythonTest\\io\\io_5.txt'
+# if os.path.exists(rurl):
+#     os.remove(rurl)
+#     print('删除文件成功')
+# else:
+#     print('删除文件不存在')
+
+# shutil模块
+# 在os模块中不存在复制文件的函数 原因是复制文件并非由操作系统提供的系统调用 但shutil模块提供了copyfile()的函数
+# import shutil
+# cpNameStr = '.\\pythonTest\\io\\io_5.txt'
+# shutil.copyfile(cpNameStr,'.\\pythonTest\\io\\io_5copy.txt')
+
+# 利用Python的特性来过滤文件
+# 列出当前目录下的所有目录
+# print([x for x in os.listdir('.') if os.path.isdir(x)])
+
+# 要列出所有的.py文件
+# print([x for x in os.listdir('.') if os.path.isfile(x) and os.path.splitext(x)[1]=='.py'])
+
+
+# os.getcwd(): 查看当前所在路径
+# os.listdir(path): 列举目录下的所有文件（包含目录）,返回一个列表
+# os.path.abspsth(path): 返回目录的绝对路径
+# os.path.split(path): 将路径分为文件夹、文件名
+# os.path.join(path1,path2): 将路径进行组合
+# os.mkdir() 创建一个空目录
+# os.rmdir() 删除一个空目录
+# os.makedirs() 生成多层递归目录。
+# os.removedirs(dirname) 删除多层递归空目录
+# os.rename() 修改目录名或者文件名
+# os.path.exists(path): 判断文件或者目录是否存在
+# os.path.isfile(path): 判断是否为文件 os.path.isdir(path): 判断是否为目录 这两个方法返回的都是True或者False 所以记住一个和 os.path.exists则可以判断目录或者文件夹了
+# os.path.getsize(name):获得绝对路径
+
+# 在当前目录以及当前目录的所有子目录下查找文件名包含指定字符串的文件，并打印出相/绝对路径
+# 使用r就防止了\t的转义 r 表示不转义
+# Path  = r"F:\pythonSpace\pythonTest"
+# searchPath = r"F:\pythonSpace\pythonTest"
+
+# str = 'io_1'
+# Aggregate_list = []
+# def search_file(path,str,other):  #other传-1时为相对路径，否则为绝对路径
+#     for file in os.listdir(path):
+#         this_path = os.path.join(path,file)
+#         if os.path.isfile(this_path):
+#             if this_path.find(str)!=-1:
+#                 if other == - 1:
+#                     this_path = this_path.replace(searchPath,'')[1:]
+#                     Aggregate_list.append(this_path)
+#                 else:
+#                     Aggregate_list.append(this_path)
+#         else:
+#             search_file(this_path,str,other)
+#     return Aggregate_list
+# print(search_file(searchPath,str,-1))
+
+
+
+
+
+
+
+
+
+   
