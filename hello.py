@@ -1384,23 +1384,114 @@ from datetime import datetime,timedelta,timezone
 # 如果要存储datetime，最佳方法是将其转换为timestamp再存储，因为timestamp的值与时区完全无关。
 
 # 如2015-1-21 9:01:30，以及一个时区信息如UTC+5:00，均是str，请编写一个函数将其转换为timestamp
-def to_timestamp(dt_str, tz_str):
-    h = int(tz_str[3:-3])
-    tz = timezone(timedelta(hours=h))
-    dt= datetime.strptime(dt_str,'%Y-%m-%d %H:%M:%S')
-    dt = dt.replace(tzinfo=tz)
-    return dt.timestamp()
-print(to_timestamp('2021-1-21 9:01:30','UTC+08:00')) #1611190890
-print(datetime(2021,1,21,9,1,30).timestamp())   #1611190890
-print(datetime.now().timestamp())  #1614050937.889305
+# def to_timestamp(dt_str, tz_str):
+#     h = int(tz_str[3:-3])
+#     tz = timezone(timedelta(hours=h))
+#     dt= datetime.strptime(dt_str,'%Y-%m-%d %H:%M:%S')
+#     dt = dt.replace(tzinfo=tz)
+#     return dt.timestamp()
+# print(to_timestamp('2021-1-21 9:01:30','UTC+08:00')) #1611190890
+# print(datetime(2021,1,21,9,1,30).timestamp())   #1611190890
+# print(datetime.now().timestamp())  #1614050937.889305
 
 
+# collections
+# collections是Python内建的一个集合模块，提供了许多有用的集合类
+# namedtuple：是一个函数，它用来创建一个自定义的tuple对象，并且规定了tuple元素的个数，并可以用属性而不是索引来引用tuple的某个元素。
+# namedtuple('名称', [属性list]):
 
+# from collections import namedtuple
+# Point = namedtuple('Point',['x','y'])
+# p = Point(2,3)
+# print(p.x,p.y)
 
+# deque
+# 使用list存储数据时，按索引访问元素很快，但是插入和删除元素就很慢
+# deque是为了高效实现插入和删除操作的双向列表，适合用于队列和栈
+# deque除了实现list的append()和pop()外，还支持appendleft()和popleft()，这样就可以非常高效地往头部添加或删除元素
 
+# from collections import deque
+# q =  deque(['a','b','c'])
+# q.append('x')
+# q.appendleft('y')
+# print(q) #deque(['y', 'a', 'b', 'c', 'x'])
 
-
-
-
+# defaultdict
+# 使用dict时，如果引用的Key不存在，就会抛出KeyError。如果希望key不存在时，返回一个默认值，就可以用defaultdict
+# 默认值是调用函数返回的，而函数在创建defaultdict对象时传入
+# from collections import defaultdict
+# df = defaultdict(lambda :'N/A')
+# df['key1'] = 'aaaa'
+# print(df['key1']) #aaaa
+# print(df['key2']) #N/A
 
    
+#OrderedDict
+# OrderedDict的Key会按照插入的顺序排列，不是Key本身排序
+
+# from collections import OrderedDict
+# od = dict([('a',1),('c',2),('b',3)])
+# print(od) #{'a': 1, 'c': 2, 'b': 3}
+# od2 = OrderedDict([('a',1),('c',2),('b',3)])
+# print(od2)  #OrderedDict([('a', 1), ('c', 2), ('b', 3)])
+# od3 = OrderedDict()
+# od3['z'] = 2
+# od3['y'] = 3
+# od3['x'] =1
+# print(od3.keys()) #odict_keys(['z', 'y', 'x'])
+
+# ChainMap
+# 把一组dict串起来并组成一个逻辑上的dict ChainMap本身也是一个dict，但是查找的时候，会按照顺序在内部的dict依次查找。
+# 读写这个对象就像是读字典一样 不会真的把字典合并在一起，而是在内部储存一个Key到每个字典的映射 
+# 先去查询这个key在哪个字典里面，然后再去对应的字典里面查询对应的值
+# 1.两个字典里面有一个Key的名字相同，那么使用ChainMap以后会读取哪一个？答：第一个拥有这个Key的字典里面的值
+from collections import ChainMap
+# ca = {'a':1,'c':3}
+# cb = {'b':2,'a':5}
+# e = ChainMap(ca,cb)
+# print(e['a']) #1
+
+# 2.为ChainMap对象添加一个Key-Value对，那么这个值会添加到哪里？ 答：新的Key-Value会被添加进第一个字典里面
+# ca = {'a':1,'c':3}
+# cb = {'b':2,'a':5}
+# e = ChainMap(ca,cb)
+# e['d'] = 45
+# print(ca,cb) #{'a': 1, 'c': 3, 'd': 45} {'b': 2, 'a': 5}
+
+#3.从原字典里面删除一个Key，ChainMap对象里面的Key也会消失吗? 答：如果修改了原来的字典，那么 ChainMap对象也会相应更新
+# ca = {'a':1,'c':3}
+# cb = {'b':2,'a':5}
+# e = ChainMap(ca,cb)
+# ca['e'] = 6
+# print(e) #ChainMap({'a': 1, 'c': 3, 'e': 6}, {'b': 2, 'a': 5})
+# del ca['e']
+# print(e)
+
+# 4.从ChainMap对象里面删除一个Key，那么原字典里面的Key会消失吗?
+# 答：如果这个Key只在一个源字典中存在，那么这个Key会被从源字典中删除。
+# 如果这个Key在多个字典中都存在，那么Key会被从第一个字典中删除。当被从第一个字典中删除以后，第二个源字典的Key可以继续被 ChainMap读取。
+# ca = {'a':1,'c':3}
+# cb = {'b':2,'a':5}
+# e = ChainMap(ca,cb)
+# e.pop('c') 
+# print(ca,cb) #{'a': 1} {'b': 2, 'a': 5}
+# e.pop('a')
+# print(ca,cb) #{} {'b': 2, 'a': 5}
+# print(e['a']) # 5
+
+#Counter
+# Counter是一个简单的计数器，例如，统计字符出现的个数 
+# Counter实际上也是dict的一个子类
+# from collections import Counter
+# c = Counter()
+# for char in 'progress':
+#     c[char] = c[char]+1
+
+# print(c) #Counter({'r': 2, 's': 2, 'p': 1, 'o': 1, 'g': 1, 'e': 1})
+# #  也可以一次性update
+# c.update('hello') #会计算progress 和hello的 
+# print(c) #Counter({'r': 2, 'o': 2, 'e': 2, 's': 2, 'l': 2, 'p': 1, 'g': 1, 'h': 1})
+
+# c2 = Counter()
+# c2.update('wo shi ni') #Counter({' ': 2, 'i': 2, 'w': 1, 'o': 1, 's': 1, 'h': 1, 'n': 1}) 空格也会计算
+# print(c2)
