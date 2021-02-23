@@ -1495,3 +1495,73 @@ from collections import ChainMap
 # c2 = Counter()
 # c2.update('wo shi ni') #Counter({' ': 2, 'i': 2, 'w': 1, 'o': 1, 's': 1, 'h': 1, 'n': 1}) 空格也会计算
 # print(c2)
+
+
+# base64
+# Base64是一种用64个字符来表示任意二进制数据的方法。0~63   0~111111 6位
+# 最常见的二进制编码方法
+# Base64是一种通过查表的编码方法，不能用于加密，即使使用自定义的编码表也不行
+# Base64编码会把3字节的二进制数据编码为4字节的文本数据，长度增加33%，好处是编码后的文本数据可以在邮件正文、网页等直接显示
+#Base64适用于小段内容的编码，比如数字证书签名、Cookie的内容等
+# Base64的原理:
+# 1.准备一个包含64个字符的数组：['A', 'B', 'C', ... 'a', 'b', 'c', ... '0', '1', ... '+', '/']
+# 2.对二进制数据进行处理，每3个字节一组，一共是3x8=24bit，划为4组，每组正好6个bit
+# 3.得到4个数字作为索引，然后查表，获得相应的4个字符，就是编码后的字符串
+# 如果要编码的二进制数据不是3的倍数，最后会剩下1个或2个字节怎么办？Base64用\x00字节在末尾补足后，再在编码的末尾加上1个或2个=号，表示补了多少字节，解码的时候，会自动去掉。
+
+import base64 
+# bd = base64.b64encode(b'binary\x00string')
+# print(bd) #b'YmluYXJ5AHN0cmluZw=='
+# st = base64.b64decode(b'YmluYXJ5AHN0cmluZw==')
+# print(st) #b'binary\x00string'
+
+# tip = '世界你好'
+# tb = bytes(tip,'utf-8')
+# print(tb) #b'\xe4\xb8\x96\xe7\x95\x8c\xe4\xbd\xa0\xe5\xa5\xbd'
+# bd2 = base64.b64encode(tb)  #b'5LiW55WM5L2g5aW9'
+# print(bd2)
+
+# b = b''         # 创建一个空的bytes
+# b = bytes()      # 创建一个空的bytes
+# b = b'hello'    #  直接指定这个hello是bytes类型
+# b = bytes('string',encoding='编码类型')  #利用内置bytes方法，将字符串转换为指定编码的bytes
+# b = str.encode('编码类型')   # 利用字符串的encode方法编码成bytes，默认为utf-8类型
+# bytes.decode('编码类型')：将bytes对象解码成字符串，默认使用utf-8进行解码。
+
+# 标准的Base64编码后可能出现字符+和/，在URL中就不能直接作为参数，所以又有一种"url safe"的base64编码，其实就是把字符+和/分别变成-和_：
+# bt = b'i\xb7\x1d\xfb\xef\xff'
+# print(base64.b64encode(bt))  #b'abcd++//'
+# print(base64.urlsafe_b64encode(bt)) #b'abcd--__'
+
+# 由于=字符也可能出现在Base64编码中，但=用在URL、Cookie里面会造成歧义，所以，很多Base64编码后会把=去掉：
+# 标准Base64:
+# 'abcd' -> 'YWJjZA=='
+# 自动去掉=:
+# 'abcd' -> 'YWJjZA'
+
+# Base64编码的长度永远是4的倍数，因此，需要加上=把Base64字符串的长度变为4的倍数，就可以正常解码
+
+# 写一个能处理去掉=的base64解码函数：
+# def safe_base64_decode(s):  #s是64编码
+#     length = len(s)
+#     mod = length % 4  #长度必须4的倍数 差几位则末位自动补= 进行解码
+#     s += b'='*(4-mod) if (mod != 0 and mod !=4) else b''
+#     return base64.urlsafe_b64decode(s)
+
+# assert b'abcd' == safe_base64_decode(b'YWJjZA==')
+# assert b'abcd' == safe_base64_decode(b'YWJjZA')
+# print('ok')
+
+# 去掉=号
+# def safe_base64_decode(s):  #s未常规字符串
+# 	b = base64.b64encode(s.encode('utf-8'))#因为python3.x中字符都为unicode编码，而b64encode函数的参数为byte类型，所以必须先转码
+# 	bstr_tmp = str(b,'utf-8') #把byte类型的数据转换为utf-8的数据
+# 	b_str= bstr_tmp.strip(r'=+') #用正则把 = 去掉
+# 	return b_str
+ 
+# s = "binarybstr\x00string"
+# safe_b = safe_base64_decode(s)
+# print(safe_b)
+
+
+
