@@ -1563,5 +1563,101 @@ import base64
 # safe_b = safe_base64_decode(s)
 # print(safe_b)
 
+# struct https://www.liaoxuefeng.com/wiki/1016959663602400/1017685387246080
+# struct模块来解决bytes和其他二进制数据类型的转换。
+import struct
+# >表示字节顺序是big-endian，也就是网络序，I表示4字节无符号整数。
+# print(struct.pack('>I',10240099))   #b'\x00\x9c@c'
 
+# unpack把bytes变成相应的数据类型
+# >IH:  后面的bytes依次变为I：4字节无符号整数和H：2字节无符号整数。
+# print(struct.unpack('>IH',b'\xf0\xf0\xf0\xf0\x80\x80')) #(4042322160, 32896)
+
+
+# Big Endian 和 Little Endian 模式的区别
+# big endian是指低地址存放最高有效字节（MSB），而little endian则是低地址存放最低有效字节（LSB）
+# 所有网络协议也都是采用big endian的方式来传输数据的。所以有时我们也会把big endian方式称之为网络字节序
+# 数字0x12345678在两种不同字节序CPU中的存储顺序
+# Big Endian
+
+#    低地址                                            高地址
+
+#  ----------------------------------------------------------------------------->
+
+#    |     12     |      34    |     56      |     78    |
+
+# Little Endian 
+
+#    低地址                                            高地址
+
+#    ----------------------------------------------------------------------------->
+
+#    |     78     |      56    |     34      |     12    |
+
+
+# hashlib
+# Python的hashlib提供了常见的摘要算法，如MD5，SHA1等等。
+# 摘要算法又称哈希算法、散列算法。它通过一个函数，把任意长度的数据转换为一个长度固定的数据串（通常用16进制的字符串表示）。
+# 摘要算法就是通过摘要函数f()对任意长度的数据data计算出固定长度的摘要digest，目的是为了发现原始数据是否被人篡改过。
+# 摘要函数是一个单向函数，计算f(data)很容易，但通过digest反推data却非常困难
+# 要注意摘要算法不是加密算法，不能用于加密（因为无法通过摘要反推明文），只能用于防篡改，但是它的单向计算特性决定了可以在不存储明文口令的情况下验证用户口令。
+# MD5是最常见的摘要算法，速度很快，生成结果是固定的128 bit字节，通常用一个32位的16进制字符串表示。
+# SHA1的结果是160 bit字节，通常用一个40位的16进制字符串表示。 比SHA1更安全的算法是SHA256和SHA512，不过越安全的算法不仅越慢，而且摘要长度更长。
+import hashlib 
+# myMd = hashlib.md5()
+# myMd.update('hello world'.encode('utf-8'))
+# print(myMd.hexdigest()) #5eb63bbbe01eeed093cb22bb8f5acdc3
+
+# 如果数据量很大，可以分块多次调用update()，最后计算的结果是一样的
+# myMd2 = hashlib.md5()
+# myMd2.update('hello '.encode('utf-8'))
+# myMd2.update('world'.encode('utf-8'))
+# print(myMd2.hexdigest()) #5eb63bbbe01eeed093cb22bb8f5acdc3
+
+# sha1 = hashlib.sha1('hello world'.encode('utf-8'))
+# print(sha1.hexdigest())   #2aae6c35c94fcfb415dbe95f408b9ce91ee846ed
+
+# sha2 = hashlib.sha1()
+# sha2.update('hello world'.encode('utf-8'))
+# print(sha2.hexdigest()) #2aae6c35c94fcfb415dbe95f408b9ce91ee846ed
+
+# 摘要算法应用
+# name	password
+# michael	123456
+
+# username	password
+# michael	e10adc3949ba59abbe56e057f20f883e
+# 当用户登录时，首先计算用户输入的明文口令的MD5，然后和数据库存储的MD5对比，如果一致，说明口令输入正确，如果不一致，口令肯定错误。
+
+# 设计一个验证用户登录的函数，根据用户输入的口令是否正确，返回True或False
+# db = {
+#     'michael': 'e10adc3949ba59abbe56e057f20f883e',
+#     'bob': '878ef96e86145580c38c87f0410ad153',
+#     'alice': '99b1c2188db85afee403b1536010c2c9'
+# }
+
+# def login(user,password):
+#     dbp = db[user]
+#     if dbp:
+#         mymd = hashlib.md5()
+#         mymd.update(password.encode('utf-8'))
+#         if mymd.hexdigest()==dbp:
+#             return True
+#     return False
+# 测试:
+# assert login('michael', '123456')
+# assert login('bob', 'abc999')
+# assert login('alice', 'alice2008')
+# assert not login('michael', '1234567')
+# assert not login('bob', '123456')
+# assert not login('alice', 'Alice2008')
+# print('ok')
+
+# 由于常用口令的MD5值很容易被计算出来，
+# 所以，要确保存储的用户口令不是那些已经被计算出来的常用口令的MD5，这一方法通过对原始口令加一个复杂字符串来实现，俗称“加盐”：
+# def calc_md5(password):
+#     return get_md5(password + 'the-Salt')
+# 经过Salt处理的MD5口令，只要Salt不被黑客知道，即使用户输入简单口令，也很难通过MD5反推明文口令。
+# 但是如果有两个用户都使用了相同的简单口令比如123456，在数据库中，将存储两条相同的MD5值，这说明这两个用户的口令是一样的。有没有办法让使用相同口令的用户存储不同的MD5呢？
+# 如果假定用户无法修改登录名，就可以通过把登录名作为Salt的一部分来计算MD5，从而实现相同口令的用户也存储不同的MD5。
 
