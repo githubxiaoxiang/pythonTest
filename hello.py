@@ -158,6 +158,21 @@ words = ['apple', 'bat', 'bar', 'atom', 'book']
 # print(result);#[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 #--------------------------------------列表、集合和字典推导式end--------------------------------#
 
+# 切片
+# L[0:3]表示，从索引0开始取，直到索引3为止，但不包括索引3。即索引0，1，2，正好是3个元素。
+# 如果第一个索引是0，还可以省略 L[:3]
+#L[1:3] 从索引1开始，取出2个元素
+# L[-1]取倒数第一个元素  倒数第一个元素的索引是-1
+# L[-2:] 取倒数两个数
+# L[:10:2]  前10个数，每两个取一个
+# L[::5]  所有数，每5个取一个
+# L[:]   复制一个list
+# L[start: stop: step],分别为起始下标，终止下标，步长(默认为1)
+# step正负只决定切片方向，正为从左往右，负为从右往左
+# start/stop值为负代表从左往右倒数几个元素  L[3:-3] 从左3到右3区间
+# 切片始终以start为开始，stop结束，确保切片[start: stop]区间有值，否则为空表
+
+
 
 # 给定一个list或tuple，我们可以通过for循环来遍历这个list或tuple，这种遍历我们称为迭代（Iteration）
 # 迭代是通过for ... in来完成
@@ -1280,8 +1295,8 @@ import json
 # print(json.dumps(jd))  #{"name": "\u6d4b\u8bd5name", "age": 22, "score": 100}
 
 # 把JSON反序列化为Python对象，用loads()或者对应的load()方法，前者把JSON的字符串反序列化，后者从file-like Object中读取字符串并反序列化
-json_str = '{"name": "\u6d4b\u8bd5name", "age": 22, "score": 100}'
-print(json.loads(json_str)) #{'name': '测试name', 'age': 22, 'score': 100}
+# json_str = '{"name": "\u6d4b\u8bd5name", "age": 22, "score": 100}'
+# print(json.loads(json_str)) #{'name': '测试name', 'age': 22, 'score': 100}
 
 # -------------------------------JSON进阶说明start-------------------------------------
 # JSON进阶 print(json.dumps(s, default=lambda obj: obj.__dict__))
@@ -1294,6 +1309,90 @@ print(json.loads(json_str)) #{'name': '测试name', 'age': 22, 'score': 100}
 #     }
 # print(json.dumps(s, default=student2dict))
 # -------------------------------JSON进阶说明end-------------------------------------
+
+# Python既支持多进程，又支持多线程 https://www.liaoxuefeng.com/wiki/1016959663602400/1017627212385376
+# 线程是最小的执行单元，而进程由至少一个线程组成。如何调度进程和线程，完全由操作系统决定，程序自己不能决定什么时候执行，执行多长时间。
+# 多进程和多线程的程序涉及到同步、数据共享的问题，编写起来更复杂。
+
+
+# 常用内建模块
+# datetime是Python处理日期和时间的标准库
+# datetime是模块，datetime模块还包含一个datetime类，通过from datetime import datetime导入的才是datetime这个类。
+# 如果仅导入import datetime，则必须引用全名datetime.datetime
+# %a %A  %b %B   https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
+from datetime import datetime,timedelta,timezone
+# 获取当前日期和时间
+# print(datetime.now())
+
+# 获取指定日期和时间
+# dt = datetime(2020,2,23,9,00)
+# print(dt.now())
+
+# datetime转换为timestamp 时间戳
+# 1970年1月1日 00:00:00 UTC+00:00时区的时刻称为epoch time，记为0（1970年以前的时间timestamp为负数），当前时间就是相对于epoch time的秒数，称为timestamp。
+# times = datetime.timestamp(dt)
+# print(times)
+
+# timestamp转换为datetime
+# print(datetime.fromtimestamp(times)) #2020-02-23 09:00:00
+
+# timestamp是一个浮点数，它没有时区的概念，而datetime是有时区的。上述转换是在timestamp和本地时间做转换 本地时间是指当前操作系统设定的时区。
+# UTC标准时区的时间  (标准时间与北京时间差了8小时)
+# print(datetime.utcfromtimestamp(times)) #2020-02-23 01:00:00  
+
+# str转换为datetime
+# 必须把str转换为datetime。转换方法是通过datetime.strptime()实现，需要一个日期和时间的格式化字符串
+# 转换后的datetime是没有时区信息的。
+# curt = datetime.strptime('2021-1-20 20:30:50','%Y-%m-%d %H:%M:%S')
+# print(curt) 
+
+# # datetime转换为str
+# cpt = datetime.now()
+# print(cpt.strftime('%a, %b %d %H:%M'))
+
+# datetime加减
+# 对日期和时间进行加减实际上就是把datetime往后或往前计算，得到新的datetime。加减可以直接用+和-运算符，不过需要导入timedelta这个类：
+# ddt = datetime.now()
+# print(ddt)
+# print(ddt-timedelta(hours=3))
+# print(ddt+timedelta(days=1,hours=3))
+
+# 本地时间转换为UTC时间
+# datetime类型有一个时区属性tzinfo，但是默认为None，所以无法区分这个datetime到底是哪个时区，除非强行给datetime设置一个时区：
+# tz_utc_8 = timezone(timedelta(hours=8))
+# ddt2 = datetime.now()
+# print(ddt2)
+# ddt2.replace(tzinfo=tz_utc_8)
+# print(ddt2)
+# 如果系统时区恰好是UTC+8:00，那么上述代码就是正确的，否则，不能强制设置为UTC+8:00时区
+
+# 时区转换
+# print(datetime.now()) #021-02-23 10:47:39.689560
+# print(datetime.utcnow()) ##2021-02-23 02:47:39.689560
+# # 拿到UTC时间，并强制设置时区为UTC+0:00:
+# utc_dt = datetime.utcnow().replace(tzinfo=timezone.utc)
+# print(utc_dt)  #2021-02-23 02:47:39.689560+00:00
+# # astimezone()将转换时区为北京时间:
+# bj_dt = utc_dt.astimezone(timezone(timedelta(hours=8))) 
+# print(bj_dt) #2021-02-23 10:50:54.708714+08:00
+# # 不是必须从UTC+0:00时区转换到其他时区，任何带时区的datetime都可以正确转换，例如上述bj_dt到tokyo_dt的转换。
+# dj_dt1 = utc_dt.astimezone(timezone(timedelta(hours=9)))
+# dj_dt2 = bj_dt.astimezone(timezone(timedelta(hours=9)))
+# print(dj_dt1,dj_dt2)  #dj_dt1 和 dj_dt2等价
+
+# datetime表示的时间需要时区信息才能确定一个特定的时间，否则只能视为本地时间。
+# 如果要存储datetime，最佳方法是将其转换为timestamp再存储，因为timestamp的值与时区完全无关。
+
+# 如2015-1-21 9:01:30，以及一个时区信息如UTC+5:00，均是str，请编写一个函数将其转换为timestamp
+def to_timestamp(dt_str, tz_str):
+    h = int(tz_str[3:-3])
+    tz = timezone(timedelta(hours=h))
+    dt= datetime.strptime(dt_str,'%Y-%m-%d %H:%M:%S')
+    dt = dt.replace(tzinfo=tz)
+    return dt.timestamp()
+print(to_timestamp('2021-1-21 9:01:30','UTC+08:00')) #1611190890
+print(datetime(2021,1,21,9,1,30).timestamp())   #1611190890
+print(datetime.now().timestamp())  #1614050937.889305
 
 
 
