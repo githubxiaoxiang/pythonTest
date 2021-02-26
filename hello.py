@@ -1825,3 +1825,73 @@ from urllib import request,parse
 
 # 读取一大段字符串时，CharacterDataHandler可能被多次调用，所以需要自己保存起来，在EndElementHandler里面再合并。
 
+# HTMLParser https://www.cnblogs.com/liuhaidon/archive/2019/12/18/12060184.html
+# 如果我们要编写一个搜索引擎，第一步是用爬虫把目标网站的页面抓下来，第二步就是解析该HTML页面，看看里面的内容到底是新闻、图片还是视频。
+# HTML本质上是XML的子集，但是HTML的语法没有XML那么严格，所以不能用标准的DOM或SAX来解析HTML。
+# 利用HTMLParser，可以把网页中的文本、图像等解析出来。
+# 常用方法
+# HTMLParser.feed(data)：接收一个字符串类型的HTML内容，并进行解析。
+# HTMLParser.close()：当遇到文件结束标签后进行的处理方法。如果子类要复写该方法，需要首先调用HTMLParser累的close()。
+# HTMLParser.reset()：重置HTMLParser实例，该方法会丢掉未处理的html内容。
+# HTMLParser.getpos()：返回当前行和相应的偏移量。
+# HTMLParser.handle_starttag(tag, attrs)：对开始标签的处理方法。例如<div id="main">，参数tag指的是div，attrs指的是一个（name,Value)的列表，即列表里面装的数据是元组。
+# HTMLParser.handle_endtag(tag)：对结束标签的处理方法。例如</div>，参数tag指的是div。
+# HTMLParser.handle_startendtag(tag, attrs)：识别没有结束标签的HTML标签，例如<img />等。
+# HTMLParser.handle_data(data)：对标签之间的数据的处理方法。<tag>test</tag>，data指的是“test”。
+# HTMLParser.handle_comment(data)：对HTML中注释的处理方法。
+# HTMLParser.handle_entityref(name)：&nbsp 
+# HTMLParser.handle_charref(name)：&#1234
+
+# tag表示的是html标签，attrs是一个列表，列表元素为一个个“(属性，值)”形式的元组。 
+# HTMLParser会自动将tag和attrs都转为小写。
+from html.parser import HTMLParser
+from html.entities import name2codepoint
+import html
+# class MyHtmlParse(HTMLParser):
+#     def handle_starttag(self,tag,attrs):
+#         print('starttag:<%s> %s' % (tag,str(attrs)))
+    
+#     def handle_endtag(self,tag):
+#         print('endtag:<%s>' % tag)
+    
+#     def handle_startendtag(self,tag,attrs):
+#         print('startendtag:<%s/>' %tag)
+    
+#     def handle_comment(self,data):
+#         print('<!--%s-->' % data)
+    
+#     def handle_entityref(self,name):
+#         print('$%s' % name)
+    
+#     def handle_charref(self,name):
+#         print('$#%s' % name)
+    
+# hXml = '''<html>
+#             <head>这是头标签</head>
+#             <body>
+#                 <!-- test html parser -->
+#                 <p>Some <a href=\"#\">html</a> HTML&nbsp;&#1234; Ӓtutorial...<br>END</p>
+#                 <img />
+#             </body></html>'''
+# mp = MyHtmlParse()
+# mp.feed(hXml)
+# mp.close()
+
+
+# 处理HTML转义字符
+# 转义字符（Escape Sequence）由三部分组成：第一部分是一个 & 符号，第二部分是实体（Entity）名字，第三部分是一个分号。 比如，要显示小于号（<），就可以写 &lt;。
+myHtmlStr = '&lt;abc&gt;'
+# 反转义：方式1
+html_parse = HTMLParser()
+text = html_parse.unescape(myHtmlStr)
+print(text)  #<abc>
+
+# # 反转义：方式2
+text = html.unescape(myHtmlStr) #<abc>
+print(text)
+
+# 转义
+ctx = html.escape(text) #&lt;abc&gt;
+print(ctx)
+
+
