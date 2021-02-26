@@ -1336,15 +1336,15 @@ import re
 # print(re.match(r'^(\d+?)0$','102300'))
 
 # 切分字符串
-print('a b   c'.split(' '))  #['a', 'b', '', '', 'c']  没法多个空格
-print(re.split(r'\s+','a b   c'))  #['a', 'b', 'c']
-print(re.split(r'[\s\,]+','a, b   c'))  #['a', 'b', 'c']
-print(re.split(r'[\s\,\;]+','a, b   c'))  #['a', 'b', 'c']
+# print('a b   c'.split(' '))  #['a', 'b', '', '', 'c']  没法多个空格
+# print(re.split(r'\s+','a b   c'))  #['a', 'b', 'c']
+# print(re.split(r'[\s\,]+','a, b   c'))  #['a', 'b', 'c']
+# print(re.split(r'[\s\,\;]+','a, b   c'))  #['a', 'b', 'c']
 
-m = re.match(r'^(\d{3})-(\d{3,8})$', '010-12345')
-print(m.group(0)) #010-12345
-print(m.group(1)) #010
-print(m.group(2)) #12345
+# m = re.match(r'^(\d{3})-(\d{3,8})$', '010-12345')
+# print(m.group(0)) #010-12345
+# print(m.group(1)) #010
+# print(m.group(2)) #12345
 
 # 贪婪匹配
 # re.match(r'^(\d+)(0*)$', '102300').groups() #\d+采用贪婪匹配，直接把后面的0全部匹配了，结果0*只能匹配空字符串了。
@@ -1729,6 +1729,60 @@ import itertools
 
 # 无限序列只有在for迭代时才会无限地迭代下去，如果只是创建了一个迭代对象，它不会事先把无限个元素生成出来，事实上也不可能在内存中创建无限多个元素。
 # 无限序列虽然可以无限迭代下去，但是通常我们会通过takewhile()等函数根据条件判断来截取出一个有限的序列：
-natures = itertools.count(1)
-ns = itertools.takewhile(lambda x:x<=10,natures)
-print(list(ns)) #[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# natures = itertools.count(1)
+# ns = itertools.takewhile(lambda x:x<=10,natures)
+# print(list(ns)) #[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+
+# urllib
+# Get：urllib的request模块可以非常方便地抓取URL内容，也就是发送一个GET请求到指定的页面，然后返回HTTP的响应：
+
+# Post：要以POST发送一个请求，只需要把参数data以bytes形式传入
+# Handler：还需要更复杂的控制，比如通过一个Proxy去访问网站，我们需要利用ProxyHandler来处理
+from urllib import request,parse
+# 例1：对豆瓣的一个URLhttps://www.baidu.com/进行抓取，并返回响应
+# rUrl ='https://www.baidu.com/'
+# with request.urlopen(rUrl) as f:
+#     data = f.read()
+#     print('status:',f.status,f.reason)
+#     for k,v in f.getheaders():
+#         print('%s:%s' % (k,v))
+#     print('Data:\n',data.decode('utf-8'))
+
+#模拟浏览器发送GET请求，就需要使用Request对象，通过往Request对象添加HTTP头，我们就可以把请求伪装成浏览器
+# 例2：模拟iPhone 6去请求豆瓣首页
+# req = request.Request('http://www.douban.com/')
+# req.add_header('User-Agent','Mozilla/6.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/8.0 Mobile/10A5376e Safari/8536.25')
+# with request.urlopen(req) as f:
+#     data = f.read()
+#     print('status:',f.status,f.reason)
+#     for k,v in f.getheaders():
+#         print('%s:%s' % (k,v))
+#     print('Data:\n',data.decode('utf-8'))
+
+# 例3：模拟一个微博登录，先读取登录的邮箱和口令，然后按照weibo.cn的登录页的格式以username=xxx&password=xxx的编码传入
+# 以POST发送一个请求，只需要把参数data以bytes形式传入
+print('login to weibo.cn....')
+email = input('Email:')
+passwd = input('Password:')
+login_data = parse.urlencode([
+    ('username', email),
+    ('password', passwd),
+    ('entry', 'mweibo'),
+    ('client_id', ''),
+    ('savestate', '1'),
+    ('ec', ''),
+    ('pagerefer', 'https://passport.weibo.cn/signin/welcome?entry=mweibo&r=http%3A%2F%2Fm.weibo.cn%2F')
+])
+req = request.Request('https://passport.weibo.cn/sso/login')
+req.add_header('Origin','https://passport.weibo.cn')
+req.add_header('User-Agent','Mozilla/6.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/8.0 Mobile/10A5376e Safari/8536.25')
+req.add_header('Referer','https://passport.weibo.cn/signin/login?entry=mweibo&res=wel&wm=3349&r=http%3A%2F%2Fm.weibo.cn%2F')
+
+with request.urlopen(req,data=login_data.encode('utf-8')) as f:
+    print('Status:',f.status,f.reason)
+    for k,v in f.getheaders():
+        print('%s:%s' % (k,v))
+    print("Data:\n",f.read().decode('utf-8'))
+# 登录成功        Data: {"retcode":20000000,"msg":"","data":{...,"uid":"1658384301"}}
+# 登录失败 Data:{"retcode":50050011,"msg":"\u8bf7\u5b8c\u6210\u9a8c\u8bc1","data":{"errurl":"https:\/\/passport.weibo.cn\/signin\/secondverify\/index?id=2MDJgNe9lAAQfmwSPo-Eoa2caibijGrssBWxvZ2lu&first_enter=1","errline":526}}
