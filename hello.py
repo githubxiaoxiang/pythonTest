@@ -1762,27 +1762,66 @@ from urllib import request,parse
 
 # 例3：模拟一个微博登录，先读取登录的邮箱和口令，然后按照weibo.cn的登录页的格式以username=xxx&password=xxx的编码传入
 # 以POST发送一个请求，只需要把参数data以bytes形式传入
-print('login to weibo.cn....')
-email = input('Email:')
-passwd = input('Password:')
-login_data = parse.urlencode([
-    ('username', email),
-    ('password', passwd),
-    ('entry', 'mweibo'),
-    ('client_id', ''),
-    ('savestate', '1'),
-    ('ec', ''),
-    ('pagerefer', 'https://passport.weibo.cn/signin/welcome?entry=mweibo&r=http%3A%2F%2Fm.weibo.cn%2F')
-])
-req = request.Request('https://passport.weibo.cn/sso/login')
-req.add_header('Origin','https://passport.weibo.cn')
-req.add_header('User-Agent','Mozilla/6.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/8.0 Mobile/10A5376e Safari/8536.25')
-req.add_header('Referer','https://passport.weibo.cn/signin/login?entry=mweibo&res=wel&wm=3349&r=http%3A%2F%2Fm.weibo.cn%2F')
+# print('login to weibo.cn....')
+# email = input('Email:')
+# passwd = input('Password:')
+# login_data = parse.urlencode([
+#     ('username', email),
+#     ('password', passwd),
+#     ('entry', 'mweibo'),
+#     ('client_id', ''),
+#     ('savestate', '1'),
+#     ('ec', ''),
+#     ('pagerefer', 'https://passport.weibo.cn/signin/welcome?entry=mweibo&r=http%3A%2F%2Fm.weibo.cn%2F')
+# ])
+# req = request.Request('https://passport.weibo.cn/sso/login')
+# req.add_header('Origin','https://passport.weibo.cn')
+# req.add_header('User-Agent','Mozilla/6.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/8.0 Mobile/10A5376e Safari/8536.25')
+# req.add_header('Referer','https://passport.weibo.cn/signin/login?entry=mweibo&res=wel&wm=3349&r=http%3A%2F%2Fm.weibo.cn%2F')
 
-with request.urlopen(req,data=login_data.encode('utf-8')) as f:
-    print('Status:',f.status,f.reason)
-    for k,v in f.getheaders():
-        print('%s:%s' % (k,v))
-    print("Data:\n",f.read().decode('utf-8'))
+# with request.urlopen(req,data=login_data.encode('utf-8')) as f:
+#     print('Status:',f.status,f.reason)
+#     for k,v in f.getheaders():
+#         print('%s:%s' % (k,v))
+#     print("Data:\n",f.read().decode('utf-8'))
 # 登录成功        Data: {"retcode":20000000,"msg":"","data":{...,"uid":"1658384301"}}
 # 登录失败 Data:{"retcode":50050011,"msg":"\u8bf7\u5b8c\u6210\u9a8c\u8bc1","data":{"errurl":"https:\/\/passport.weibo.cn\/signin\/secondverify\/index?id=2MDJgNe9lAAQfmwSPo-Eoa2caibijGrssBWxvZ2lu&first_enter=1","errline":526}}
+
+
+# XML
+# DOM vs SAX
+# 操作XML有两种方法：DOM和SAX。DOM会把整个XML读入内存，解析为树，因此占用内存大，解析慢，优点是可以任意遍历树的节点。SAX是流模式，边读边解析，占用内存小，解析快，缺点是我们需要自己处理事件。
+# 正常情况下，优先考虑SAX，因为DOM实在太占内存。
+# SAX解析XML非常简洁，通常我们关心的事件是start_element，end_element和char_data，准备好这3个函数
+# 如：<a href="/">python</a>  
+# 产生3个事件
+# 1、start_element事件，在读取<a href="/">时；
+# 2、char_data事件，在读取python时；
+# 3、end_element事件，在读取</a>时。
+# from xml.parsers.expat import ParserCreate
+# from xml.parsers.expat import ParserCreate
+# class DefaultSaxHandler(object):
+#     def start_element(self,name,attrs):
+#         print('sax:start_element:%s，attrs:%s' % (name,str(attrs)))
+    
+#     def end_element(self,name):
+#         print('sax:end_element:%s' % name)
+
+#     def char_data(self,text):
+#         print('sax:char_data:%s' % text)
+
+# xml = r'''<?xml version="1.0"?>
+# <ol>
+#     <li><a href="/python">Python</a></li>
+#     <li><a href="/ruby">Ruby</a></li>
+# </ol>
+# '''
+# p = ParserCreate()
+# handler = DefaultSaxHandler()
+# p.StartElementHandler = handler.start_element
+# p.EndElementHandler = handler.end_element
+# p.CharacterDataHandler = handler.char_data
+# p.Parse(xml)
+
+# 读取一大段字符串时，CharacterDataHandler可能被多次调用，所以需要自己保存起来，在EndElementHandler里面再合并。
+
