@@ -1880,18 +1880,78 @@ import html
 
 # 处理HTML转义字符
 # 转义字符（Escape Sequence）由三部分组成：第一部分是一个 & 符号，第二部分是实体（Entity）名字，第三部分是一个分号。 比如，要显示小于号（<），就可以写 &lt;。
-myHtmlStr = '&lt;abc&gt;'
-# 反转义：方式1
-html_parse = HTMLParser()
-text = html_parse.unescape(myHtmlStr)
-print(text)  #<abc>
+# myHtmlStr = '&lt;abc&gt;'
+# # 反转义：方式1
+# html_parse = HTMLParser()
+# text = html_parse.unescape(myHtmlStr)
+# print(text)  #<abc>
 
-# # 反转义：方式2
-text = html.unescape(myHtmlStr) #<abc>
-print(text)
+# # # 反转义：方式2
+# text = html.unescape(myHtmlStr) #<abc>
+# print(text)
 
-# 转义
-ctx = html.escape(text) #&lt;abc&gt;
-print(ctx)
+# # 转义
+# ctx = html.escape(text) #&lt;abc&gt;
+# print(ctx)
 
 
+# 例如https://www.python.org/events/python-events/，用浏览器查看源码并复制，然后尝试解析一下HTML，输出Python官网发布的会议时间、名称和地点。
+# Python官网发布的会议时间、名称和地点的网页源码样式：
+#  <li>
+#       <h3 class="event-title"><a href="/events/python-events/776/">PyCon AU 2019</a></h3>
+#     <p>                 
+#         <time datetime="2019-08-02T00:00:00+00:00">02 Aug. &ndash; 06 Aug. <span class="say-no-more"> 2019</span></time>
+#         <span class="event-location">Sydney, Australia</span>              
+#     </p>
+#  </li>
+# 上段未html  非代码
+
+fUrl = 'https://www.python.org/events/python-events/'
+def get_data(path):
+    myHeader = {
+        'User-Agent':'Mozilla/6.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/8.0 Mobile/10A5376e Safari/8536.25'
+    }
+    req = request.Request(path,headers=myHeader)
+    with request.urlopen(req,timeout=25) as f:
+        data = f.read()
+        print(f'Status: {f.status} {f.reason}')
+        return data.decode('utf-8')
+
+
+class MyHTMLParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.__parsedata ='' # 设置一个空的标志位
+        self.info  = []
+
+    def handle_starttag(self,tag,attrs):
+        if ('class','event-title') in attrs:
+            self.__parsedata = 'name'
+        if tag =="time":
+            self.__parsedata = 'time'
+        if ('class','say-no-more') in attrs:
+            self.__parsedata = 'year'
+        if ('class','event-location') in attrs:
+            self.__parsedata = 'location'
+    
+    def handle_endtag(self,tag):
+        self.__parsedata = '' # 在HTML 标签结束时，把标志位清空
+    
+    def handle_data(self,data):
+        if self.__parsedata=='name':
+            self.info.append(f'会议名称：{data}')
+        if self.__parsedata=='time':
+            self.info.append(f'会议时间：{data}')
+        if self.__parsedata=='year':
+            if re.match(r'\s\d{4}',data):
+                self.info.append(f'会议年份：{data.strip()}')   # 因为后面还有两组 say-no-more 后面的data却不是年份信息,所以用正则检测一下
+        if self.__parsedata=='location':
+            self.info.append(f'会议地点：{data}')
+
+myP = MyHTMLParser()
+data = get_data(fUrl)
+myP.feed(data)
+myP.close()
+for s in myP.info:
+    print(s)
+    
